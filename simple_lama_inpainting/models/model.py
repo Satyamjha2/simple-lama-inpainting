@@ -13,10 +13,16 @@ LAMA_MODEL_URL = os.environ.get(
 class SimpleLama:
     def __init__(
         self,
-        device: torch.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        ),
+        device: torch.device = None,
     ) -> None:
+        if device is None:  
+            # Choose the device based on availability
+            if torch.backends.mps.is_available():
+                device = torch.device("mps")
+            elif torch.cuda.is_available():
+                device = torch.device("cuda")
+            else:
+                device = torch.device("cpu")
         if os.environ.get("LAMA_MODEL"):
             model_path = os.environ.get("LAMA_MODEL")
             if not os.path.exists(model_path):
